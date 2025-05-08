@@ -1,0 +1,34 @@
+version: "3.9"
+services:
+  db:
+    image: postgres:16
+    environment:
+      POSTGRES_USER: addrmatch
+      POSTGRES_PASSWORD: pwd
+      POSTGRES_DB: addrdb
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+  app:
+    build: .
+    depends_on:
+      - db
+    environment:
+      PGHOST: db
+      PGUSER: addrmatch
+      PGPASSWORD: pwd
+      PGDATABASE: addrdb
+    volumes:
+      - .:/code
+      - ./output:/output
+      - ./data:/data 
+  api:
+    extends:
+      service: app
+    command: >
+      -m uvicorn fastapi_app:app --host 0.0.0.0 --port 8000 --reload
+    ports:
+      - "8000:8000"
+volumes:
+  pgdata:

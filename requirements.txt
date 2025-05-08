@@ -1,0 +1,10 @@
+pandas
+usaddress
+psycopg2-binary
+rapidfuzz
+tqdm
+phonetics
+pytest
+fastapi
+uvicorn
+psutil
