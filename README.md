@@ -44,7 +44,7 @@ docker compose run --rm app        python simulate.py          --src /data/trans
 
 # 3. Ingest both files  
 ## 3.1 Run Schema.sql
-Get-Content schema.sql -Raw | docker exec -i address_matching-1-db psql -U addrmatch -d addrdb
+Get-Content schema.sql -Raw | docker exec -i address_matching-1-db-1 psql -U addrmatch -d addrdb
 
 ## 3.2 Ingest original CSV
 docker compose run app ingest.py --transactions /data/transactions_2_11211.csv --addresses "/data/11211 Addresses.csv"
