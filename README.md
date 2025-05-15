@@ -53,7 +53,7 @@ docker compose run app ingest.py --transactions /data/transactions_2_11211.csv -
 docker compose run --rm app ingest.py --transactions /code/transactions_upsampled.csv --addresses "/data/11211 Addresses.csv"
 
 # 4. Run the full pipeline (parse → match → fallback → exports)
-docker compose run --rm app python run_pipeline.py --workers 6
+docker compose run --rm --entrypoint python app run_pipeline.py --workers 6
 # Output:
 # • /output/matched.csv (id, address_id, confidence, match_type)
 # • /output/unmatched.csv (id, raw_address, reason)
