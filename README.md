@@ -42,11 +42,14 @@ docker compose up -d db
 # 2. (Optional) Generate a 200M-row CSV in a streamed fashion
 docker compose run --rm app        python simulate.py          --src /data/transactions_2_11211.csv          --target 200000000
 
-# 3. Ingest both files
-## 3.1 Ingest original CSV
+# 3. Ingest both files  
+## 3.1 Run Schema.sql
+Get-Content schema.sql -Raw | docker exec -i address_matching-1-db psql -U addrmatch -d addrdb
+
+## 3.2 Ingest original CSV
 docker compose run app ingest.py --transactions /data/transactions_2_11211.csv --addresses "/data/11211 Addresses.csv"
 
-## 3.2 Ingest 200M-row CSV
+## 3.3 (Optional) Ingest 200M-row CSV
 docker compose run --rm app ingest.py --transactions /code/transactions_upsampled.csv --addresses "/data/11211 Addresses.csv"
 
 # 4. Run the full pipeline (parse → match → fallback → exports)
