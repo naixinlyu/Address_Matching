@@ -4,10 +4,21 @@ from rapidfuzz import process, fuzz
 import psycopg2, os
 from parse import parse_address
 
-app = FastAPI(title="Address Matcher API")
+app = FastAPI(
+    title="Address Matcher API",
+    description="API for matching and validating addresses",
+    version="1.0.0",
+    docs_url="/docs",  # Swagger UI
+    redoc_url="/redoc"  # ReDoc UI
+)
 
 class AddressIn(BaseModel):
     raw_address: str
+
+class AddressResponse(BaseModel):
+    address_id: int
+    match_type: str
+    confidence: float
 
 def db():
     return psycopg2.connect(
@@ -19,8 +30,29 @@ def db():
 
 THRESH = 80 
 
-@app.post("/match_address")
-def match_address(inp: AddressIn):
+@app.get("/")
+async def root():
+    """Root endpoint that redirects to API documentation"""
+    return {
+        "message": "Welcome to Address Matcher API",
+        "documentation": {
+            "swagger": "/docs",
+            "redoc": "/redoc"
+        }
+    }
+
+@app.post("/match_address", response_model=AddressResponse)
+async def match_address(inp: AddressIn):
+    """
+    Match an address against the database.
+    
+    - **raw_address**: The address string to match
+    
+    Returns:
+    - **address_id**: The matched address ID
+    - **match_type**: Type of match (exact/fuzzy)
+    - **confidence**: Match confidence score (0-1)
+    """
     p = parse_address(inp.raw_address)
 
     if not p.get("zip") or not p.get("street_number"):

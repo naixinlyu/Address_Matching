@@ -10,6 +10,7 @@ Steps
 
 import argparse, os, psycopg2, sys, time
 
+
 ap = argparse.ArgumentParser()
 ap.add_argument("--transactions", required=True)
 ap.add_argument("--addresses",    required=True)
@@ -82,7 +83,7 @@ txn_cols = (
 )
 with open(args.transactions, encoding="utf8") as f:
     cur.copy_expert(
-        f"COPY transactions_raw({txn_cols}) FROM STDIN WITH CSV HEADER NULL ''",
+        f"COPY transactions_raw({txn_cols}) FROM STDIN WITH CSV HEADER NULL 'NULL'",
         f,
     )
 conn.commit()
@@ -102,10 +103,14 @@ SELECT
   NULLIF(NULLIF(year_built,'NULL'),'')::int,
   presented_by,brokered_by,presented_by_mobile,mls,
   listing_office_id,listing_agent_id,
-  created_at,updated_at,open_house,
+  NULLIF(NULLIF(created_at,'NULL'),'')::timestamp,
+  NULLIF(NULLIF(updated_at,'NULL'),'')::timestamp,
+  open_house,
   NULLIF(NULLIF(latitude ,'NULL'),'')::numeric,
   NULLIF(NULLIF(longitude,'NULL'),'')::numeric,
-  email,list_date,pending_date,
+  email,
+  NULLIF(NULLIF(list_date,'NULL'),'')::date,
+  NULLIF(NULLIF(pending_date,'NULL'),'')::date,
   presented_by_first_name,presented_by_last_name,
   presented_by_middle_name,presented_by_suffix,geog
 FROM transactions_raw;
@@ -116,53 +121,4 @@ print("Transactions loaded")
 
 cur.close(); conn.close()
 print("Ingest completed without errors.")
-
-
-# import argparse, psycopg2, os, pandas as pd
-
-# parser = argparse.ArgumentParser()
-# parser.add_argument('--transactions', required=True)
-# parser.add_argument('--addresses', required=True)
-# args = parser.parse_args()
-
-# conn = psycopg2.connect(
-#     host=os.getenv('PGHOST','localhost'),
-#     user=os.getenv('PGUSER','addrmatch'),
-#     password=os.getenv('PGPASSWORD','pwd'),
-#     dbname=os.getenv('PGDATABASE','addrdb'))
-# cur = conn.cursor()
-
-# # Load transactions exactly as before
-# txn_cols = ",".join([
-#     "id","status","price","bedrooms","bathrooms","square_feet",
-#     "address_line_1","address_line_2","city","state","zip_code",
-#     "property_type","year_built","presented_by","brokered_by",
-#     "presented_by_mobile","mls","listing_office_id","listing_agent_id",
-#     "created_at","updated_at","open_house","latitude","longitude",
-#     "email","list_date","pending_date","presented_by_first_name",
-#     "presented_by_last_name","presented_by_middle_name",
-#     "presented_by_suffix","geog"
-# ])
-# copy_txn = f"COPY transactions({txn_cols}) FROM STDIN WITH CSV HEADER NULL 'NULL'"
-
-# with open(args.transactions, "r", encoding="utf8") as f:
-#     cur.copy_expert(copy_txn, f)
-# conn.commit()
-# print(f"Loaded transactions from {args.transactions}")
-
-# # Load addresses with explicit column list
-# addr_cols = ",".join([
-#     "hhid","fname","mname","lname","suffix","address","house","predir",
-#     "street","strtype","postdir","apttype","aptnbr","city","state","zip",
-#     "latitude","longitude","homeownercd"
-# ])
-# copy_addr = f"COPY addresses({addr_cols}) FROM STDIN WITH CSV HEADER NULL 'NULL'"
-
-# with open(args.addresses, "r", encoding="utf8") as f:
-#     cur.copy_expert(copy_addr, f)
-# conn.commit()
-# print(f"Loaded addresses from {args.addresses}")
-
-# cur.close()
-# conn.close()
 

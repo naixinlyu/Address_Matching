@@ -64,7 +64,7 @@ with (OUT_DIR / "unmatched.csv").open("w", encoding="utf8") as f:
         COPY (
           SELECT id,
                  address_line_1 AS raw_address,
-                 COALESCE(failure_reason,'no_match') AS reason
+                 COALESCE(failure_reason,'failed parsed') AS reason
           FROM transactions
           WHERE address_id IS NULL
         ) TO STDOUT WITH CSV HEADER

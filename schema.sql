@@ -92,7 +92,11 @@ ALTER TABLE transactions_raw
     ALTER COLUMN square_feet      TYPE TEXT,
     ALTER COLUMN year_built       TYPE TEXT,
     ALTER COLUMN latitude         TYPE TEXT,
-    ALTER COLUMN longitude        TYPE TEXT;
+    ALTER COLUMN longitude        TYPE TEXT,
+    ALTER COLUMN created_at       TYPE TEXT,
+    ALTER COLUMN updated_at       TYPE TEXT,
+    ALTER COLUMN list_date        TYPE TEXT,
+    ALTER COLUMN pending_date     TYPE TEXT;
 
 -- Indexes
 --  Fuzzy street‑name searches on canonical table
