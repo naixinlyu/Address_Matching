@@ -1,8 +1,8 @@
 {
   "rss_start_mb": 21.5,
-  "parse.py_sec": 0.3,
-  "match.py_sec": 0.3,
+  "parse.py_sec": 0.7,
+  "match.py_sec": 4.0,
   "fallback.py_sec": 0.1,
-  "total_sec": 0.7,
+  "total_sec": 4.8,
   "peak_rss_mb": 21.5
 }

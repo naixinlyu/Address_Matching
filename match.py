@@ -3,8 +3,15 @@ import os
 import psycopg2
 from rapidfuzz import process, fuzz
 from parse import parse_address
+import re
 
 THRESH = 80 
+
+def clean_duplicate_units(address):
+    # Remove duplicate unit information
+    # Match patterns like "Unit X, Unit X" or "Unit X, Unit X,"
+    pattern = r'(Unit\s+[^,]+),\s*\1'
+    return re.sub(pattern, r'\1', address)
 
 def match_batch(limit=10_000):
     conn = psycopg2.connect(
@@ -33,6 +40,8 @@ def _process(rows, conn):
     cur = conn.cursor()
     for tid, l1, l2, city, state, zc in rows:
         raw = ", ".join(filter(None, [l1, l2, city, state, zc]))
+        # Clean duplicate units before parsing
+        raw = clean_duplicate_units(raw)
         p   = parse_address(raw)
 
         # exact (relaxed)
